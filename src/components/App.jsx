@@ -30,17 +30,26 @@ export class App extends Component {
 
       fetchImages(currentQuery, page).then(images => {
         this.setState({ loading: false, loadMore: true });
+        console.log(images);
+        if (images.length >= 12) {
+          // this.setState(prevState => ({
+          //   images: [...prevState.images, ...images],
+          // }));
+          this.setImages(images);
+          return;
+        } else if (images.length <= 12) {
+          this.setImages(images);
 
-        if (images.length < 12 || images.length === 0) {
           this.setState({ loadMore: false });
-          alert(`there are no more images conected with  ${this.state.query}`);
         }
-        this.setState(prevState => ({
-          images: [...prevState.images, ...images],
-        }));
       });
     }
   }
+  setImages = images => {
+    this.setState(prevState => ({
+      images: [...prevState.images, ...images],
+    }));
+  };
   resetData = () => {
     this.setState({ page: 1, images: [], loadMore: false });
   };
@@ -48,7 +57,7 @@ export class App extends Component {
     this.setState({ query });
     this.resetData();
   };
-  handleButtonClick = () => {
+  handleLoadMoreClick = () => {
     this.setState(prevState => ({ page: prevState.page + 1 }));
     console.log(this.state.page);
   };
@@ -58,9 +67,7 @@ export class App extends Component {
       <>
         <Searchbar onSubmit={this.handleSubmit} />
         <ImageGallery images={images} />
-        {loadMore && (
-          <Button disabled={loading} onClick={this.handleButtonClick} />
-        )}
+        {loadMore && <Button onClick={this.handleLoadMoreClick} />}
         {loading && (
           <Loader
             height="80"
